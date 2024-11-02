@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Troops Strategy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+	svg{
+	display:none;
+	}
+    .strategy {
+      margin: 20px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .mw-editsection{
+     display: none;
+    }
+	.strategy a{
+		cursor: text;
+        text-decoration: none;
+        color: #000;
+	}
+  </style>
+</head>
+<body>
+  <h1>Top Troops Strategy</h1>
+  <div class="strategy" id="frostWidowStrategy">
+    <h2>Frost Widow Strategy</h2>
+    <div id="frostWidowContent">Loading...</div>
+  </div>
+  <div class="strategy" id="wingedSunStrategy">
+    <h2>Winged Sun Strategy</h2>
+    <div id="wingedSunContent">Loading...</div>
+  </div>
+
+
+  <script >
+  
+  async function fetchStrategy(pageTitle, contentId) {
+  const apiUrl = `https://toptroops.fandom.com/api.php?action=parse&page=${pageTitle}&prop=sections&format=json&origin=*`;
+  
+  try {
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    const sections = data.parse.sections;
+
+    // Find the "Strategy" section
+    const strategySection = sections.find(section => section.line === "Strategy");
+    if (strategySection) {
+      // Fetch the content of the Strategy section
+      const contentResponse = await fetch(`https://toptroops.fandom.com/api.php?action=parse&page=${pageTitle}&prop=text&section=${strategySection.index}&format=json&origin=*`);
+      const contentData = await contentResponse.json();
+      document.getElementById(contentId).innerHTML = contentData.parse.text["*"];
+    } else {
+      document.getElementById(contentId).innerHTML = "Strategy section not found.";
+    }
+  } catch (error) {
+    console.error("Error fetching strategy:", error);
+    document.getElementById(contentId).innerHTML = "Error loading content.";
+  }
+}
+
+// Fetch strategy sections for both pages
+fetchStrategy("Frost_Widow", "frostWidowContent");
+fetchStrategy("Winged_Sun", "wingedSunContent");
+
+  
+  </script>
+</body>
+</html>
